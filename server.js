@@ -5,8 +5,31 @@ require("dotenv").config()
 const port = process.env.PORT || 5000
 
 
+// -------cors---------- //
+import cors from 'cors';
 
-app.use(cors({origin: "https://vcc-front.onrender.com"}))
+const allowedOrigins = [
+  'https://vcc-front.onrender.com',  // Your main frontend deployment
+];
+
+const corsOptions = {
+  origin: (origin, callback) => {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+
+    // Check if the request's origin is in the allowed origins
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,  // Allow credentials (cookies, authentication)
+};
+
+app.use(cors(corsOptions));
+
+
 app.use(express.json())
 app.use(require("./routes/record"))
 const dbo = require("./db/conn")
